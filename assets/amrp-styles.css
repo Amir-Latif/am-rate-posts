@@ -1,0 +1,17 @@
+#amrp-view {
+  display: flex;
+  margin: 2rem auto;
+}
+#amrp-view button {
+  border: none;
+  background-color: transparent;
+}
+#amrp-view .thumb-down-btn {
+  transform: rotate(180deg);
+}
+#amrp-view div {
+  font-size: 1.5rem;
+  margin: auto 0.2rem;
+}
+
+/*# sourceMappingURL=amrp-styles.css.map */
