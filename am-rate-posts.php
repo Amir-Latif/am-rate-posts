@@ -30,7 +30,6 @@ function amrp_create_table()
 
     $sql = "CREATE TABLE $table_name (
             id INTEGER NOT NULL AUTO_INCREMENT,
-            target_type VARCHAR(7) NOT NULL,
             target_id INTEGER NOT NULL,
             rate_up INTEGER NOT NULL DEFAULT 0,
             rate_down INTEGER NOT NULL DEFAULT 0,
@@ -72,35 +71,30 @@ function amrp_post_data()
     $post_id = $_POST['postId'];
     $table_record = $wpdb->get_row("SELECT rate_up, rate_down
     FROM $table_name
-    WHERE target_id = $post_id AND target_type = 'post'");
+    WHERE target_id = $post_id");
 
     if (!empty($table_record)) {
 
         $wpdb->update(
             $table_name,
             array(
-                'rate_up' => (int) $table_record->rate_up + (int) $_POST['sessionUp'],
-                'rate_down' => (int) $table_record->rate_down + (int) $_POST['sessionDown']
+                'rate_up' => (int) $_POST['rateUp'],
+                'rate_down' => (int) $_POST['rateDown']
             ),
-            array('target_id' => $post_id, 'target_type' => 'post')
+            array('target_id' => $post_id)
         );
     } else {
         $wpdb->insert(
             $table_name,
             array(
-                'target_type' => 'post',
                 'target_id' => $post_id,
-                'rate_up' => $_POST['sessionUp'],
-                'rate_down' => $_POST['sessionDown']
+                'rate_up' => $_POST['rateUp'],
+                'rate_down' => $_POST['rateDown']
             ),
-            array('%s', '%d', '%d', '%d')
+            array('%d', '%d', '%d')
         );
     }
-    
-    echo json_encode($wpdb->get_row("SELECT rate_up, rate_down
-    FROM $table_name
-    WHERE target_id = $post_id AND target_type = 'post'"));
-    
+   
     wp_die();
 }
 add_action('wp_ajax_nopriv_amrpRatePosts', 'amrp_post_data');
@@ -118,7 +112,7 @@ function amrp_add_scripts()
 
     if (is_singular('post')) {
         $post_id = get_the_ID();
-        $post_record = $wpdb->get_row("SELECT rate_up, rate_down FROM $table_name WHERE target_id = $post_id AND target_type = 'post'");
+        $post_record = $wpdb->get_row("SELECT rate_up, rate_down FROM $table_name WHERE target_id = $post_id");
 
         wp_enqueue_style('amrpCss', $plugin_path . 'assets/amrp-styles.css', array(), time());
         wp_enqueue_script('amrpJs', $plugin_path . 'assets/amrp-script.js', array(), time(), true);
