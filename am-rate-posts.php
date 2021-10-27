@@ -54,9 +54,12 @@ function amrp_get_view()
 
 function amrp_show_rates($content)
 {
-    $rating_content = amrp_get_view();
-
-    return  $content . $rating_content;
+    if (is_page('add-feedback')) {
+        return $content;
+    } else {
+        $rating_content = amrp_get_view();
+        return  $content . $rating_content;
+    }
 }
 add_filter('the_content', 'amrp_show_rates');
 
@@ -94,7 +97,7 @@ function amrp_post_data()
             array('%d', '%d', '%d')
         );
     }
-   
+
     wp_die();
 }
 add_action('wp_ajax_nopriv_amrpRatePosts', 'amrp_post_data');
